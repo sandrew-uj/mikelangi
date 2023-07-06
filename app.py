@@ -7,7 +7,7 @@ async def on_startup(dp):
     import filters
     import middlewares
     filters.setup(dp)
-    middlewares.setup(dp)
+    # middlewares.setup(dp)
 
     from utils.notify_admins import on_startup_notify
 
@@ -15,8 +15,8 @@ async def on_startup(dp):
     await db_gino.on_startup(dp)
     print("Готов!")
 
-    print("Очистим базу")
-    await db.gino.drop_all()
+    # print("Очистим базу")
+    # await db.gino.drop_all()
 
     print("Создаем таблицу")
     await db.gino.create_all()

@@ -7,7 +7,7 @@ from aiogram.types import CallbackQuery
 from filters.is_private import IsPrivate
 from handlers.users.profile_creating.users_gender import gender_question
 from keyboards.inline.confirmation import conf_callback, confirmation_keyboard
-from loader import dp
+from loader import dp, bot
 from states.profile_states import ProfileState
 from utils.db_api import quick_commands as db
 
@@ -17,7 +17,7 @@ async def image_question(message: types.Message, user_id):
     await message.answer("Загрузите фото:")
     user = await db.select_user(id=user_id)
     if user.image:
-        await show_image(user, message)
+        await show_image(user, user)
         await message.answer(f"Оставить текущее фото?", reply_markup=confirmation_keyboard)
 
 
@@ -38,10 +38,10 @@ async def get_photo(message: types.Message):
     await gender_question(message)
 
 
-async def show_image(user, message):
+async def show_image(profile_owner, receiver, caption="", reply_markup=None):
     with open('photos/profile_image.jpg', 'wb') as f:
-        f.write(user.image)
+        f.write(profile_owner.image)
 
     input_file = types.InputFile(path_or_bytesio='photos/profile_image.jpg')
-    await message.answer_photo(input_file)
+    await bot.send_photo(receiver.id, input_file, caption=caption, reply_markup=reply_markup)
     os.remove('photos/profile_image.jpg')

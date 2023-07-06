@@ -1,18 +1,15 @@
 from asyncpg import UniqueViolationError
 
 from utils.db_api.db_gino import db
+from utils.db_api.schemas.love import Love
 from utils.db_api.schemas.user import User
 
 
 async def add_user(id: int, name: str, age: int = None, description: str = None,
                    gender: str = None, interest: str = None, image=None):
-    # try:
         user = User(id=id, name=name, age=age, description=description, gender=gender,
                     interest=interest, image=image)
         await user.create()
-
-    # except UniqueViolationError:
-    #     pass
 
 
 async def select_all_users():
@@ -58,3 +55,12 @@ async def update_user_interest(id, interest):
 async def update_user_description(id, description):
     user = await User.get(id)
     await user.update(description=description).apply()
+
+
+async def add_love(liked, likes):
+    love = Love(liked=liked, likes=likes)
+    await love.create()
+
+
+async def delete_love(liked, likes):
+    await Love.delete.where(Love.liked == liked and Love.likes == likes).gino.all()

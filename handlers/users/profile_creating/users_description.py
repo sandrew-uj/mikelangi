@@ -32,4 +32,5 @@ async def cancel(message: types.Message, state: FSMContext):
 async def save(message: types.Message, state: FSMContext):
     await state.finish()
     await message.answer("Ваша анкета выглядит так:", reply_markup=ReplyKeyboardRemove())
-    await show_profile(message)
+    await show_profile(message.from_user.id, message.from_user.id)
+    await message.answer("Хотите изменить анкету? (/edit_profile)")
