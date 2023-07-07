@@ -9,7 +9,7 @@ class User(TimedBaseModel):
     name = Column(String(100))
     age = Column(Integer)
     description = Column(String(255))
-    gender = Column(String(10))
+    gender = Column(String(100))
     interest = Column(String(10))
     image = Column(LargeBinary(100))
 

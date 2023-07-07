@@ -18,7 +18,6 @@ from utils.db_api.schemas.user import User
 @dp.message_handler(IsPrivate(), Command("search"))
 async def my_search(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
-    print(f"{user_id} and {message.chat.id}")
     try:
         user = await db.select_user(id=user_id)
     except Exception:
@@ -27,13 +26,11 @@ async def my_search(message: types.Message, state: FSMContext):
     interests = await User.query.where(User.gender == user.interest and User.interest == user.gender).gino.all()
     my_interest = random.choice(interests)
     await show_profile(profile_owner_id=my_interest.id, receiver_id=user_id, reply_markup=like_or_not)
-    print("data updating")
     await state.update_data(user_id=my_interest.id)
-    print("success")
-    # await SearchState.React.set()
+    await SearchState.React.set()
 
 
-@dp.message_handler(IsPrivate(), text=LIKE)
+@dp.message_handler(IsPrivate(), state=SearchState.React, text=LIKE)
 async def my_like(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         user_id = data.get("user_id")
@@ -41,20 +38,17 @@ async def my_like(message: types.Message, state: FSMContext):
     await bot.send_message(user_id, text="Ты понравился одному человеку\n"
                            "Посмотреть: /see_love")
     await add_love(user_id, message.from_user.id)
-    # await show_profile(profile_owner_id=message.from_user.id, receiver_id=user_id, reply_markup=like_or_not)
 
     await my_search(message, state)
-    # await state.finish()
 
 
-@dp.message_handler(IsPrivate(), text=DISLIKE)
+@dp.message_handler(IsPrivate(), state=SearchState.React, text=DISLIKE)
 async def my_dislike(message: types.Message, state: FSMContext):
     print("dislike")
     await my_search(message, state)
-    # await state.finish()
 
 
-@dp.message_handler(IsPrivate(), text=SLEEP)
+@dp.message_handler(IsPrivate(), state=SearchState.React, text=SLEEP)
 async def my_sleep(message: types.Message, state: FSMContext):
     await message.answer("Я устал", reply_markup=ReplyKeyboardRemove())
-    # await state.finish()
+    await state.finish()

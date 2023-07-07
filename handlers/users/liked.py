@@ -1,5 +1,3 @@
-import random
-
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.builtin import Command
@@ -9,7 +7,7 @@ from aiogram.utils.markdown import hcode, hlink
 from filters.is_private import IsPrivate
 from handlers.users.profile_creating.profile import show_profile
 from keyboards.default.likes import like_or_not, LIKE, DISLIKE, SLEEP
-from loader import dp, bot
+from loader import dp
 from states.search_states import SearchState
 from utils.db_api import quick_commands as db
 from utils.db_api.quick_commands import delete_love
@@ -19,7 +17,6 @@ from utils.db_api.schemas.love import Love
 @dp.message_handler(IsPrivate(), Command("see_love"))
 async def im_liked(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
-    print(f"{user_id} and {message.chat.id}")
     try:
         love = await Love.query.where(Love.liked == user_id).gino.first()
     except Exception:
@@ -54,7 +51,6 @@ async def my_mismatch(message: types.Message, state: FSMContext):
 
     await delete_love(message.from_user.id, user_id)
     await im_liked(message, state)
-    await SearchState.Search.set()
 
 
 @dp.message_handler(IsPrivate(), state=SearchState.Answer, text=SLEEP)

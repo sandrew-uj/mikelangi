@@ -31,7 +31,6 @@ async def save_photo(call: CallbackQuery):
 async def get_photo(message: types.Message):
     image = message.photo[-1]
     with await image.download(destination=io.BytesIO()) as photo:
-        print(photo)
         image_bytes = photo.read()
 
     await db.update_user_image(image=image_bytes, id=message.from_user.id)
